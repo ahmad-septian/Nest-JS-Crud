@@ -48,6 +48,10 @@ export class UsersService {
     return this.userRepository.find();
   }
 
+  async findByUsername(username: string): Promise<Users | null> {
+    return this.userRepository.findOne({ where: { username } });
+  }
+
   async updateProfile(id, body, password) {
     if (password != '') {
       return this.userRepository

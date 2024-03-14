@@ -5,6 +5,15 @@ import { AgamaModule } from './agama/agama.module';
 import { typeORMAsyncConfig } from './config/typeorm.config';
 import { UsersModule } from './users/users.module';
 import { RoleModule } from './role/role.module';
+import { KeycloakModule } from './keycloak/keycloak.module';
+import {
+  AuthGuard,
+  KeycloakConnectModule,
+  ResourceGuard,
+  RoleGuard,
+} from 'nest-keycloak-connect';
+import { KeycloakService } from './keycloak/keycloak.service';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -13,8 +22,26 @@ import { RoleModule } from './role/role.module';
     AgamaModule,
     UsersModule,
     RoleModule,
+    KeycloakModule,
+    KeycloakConnectModule.registerAsync({
+      useExisting: KeycloakService,
+      imports: [KeycloakModule],
+    }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ResourceGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+  ],
 })
 export class AppModule {}
